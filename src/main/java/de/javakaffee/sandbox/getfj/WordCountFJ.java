@@ -89,7 +89,8 @@ public class WordCountFJ {
 	
 	// Read documents and extract words and word counts of documents
 	public static TreeMap<String, Integer> getWordsAndCountsFromFiles(final List<String> fileNames) {
-		return fileNames.map(readFile).map(fromStream).bind(wordsFromLazyString).foldLeft(wordsAndCounts, TreeMap.<String, Integer> empty(stringOrd));
+		return fileNames.map(readFile).map(fromStream).bind(wordsFromLazyString)
+				.foldLeft(wordsAndCounts, TreeMap.<String, Integer> empty(stringOrd));
 	}
 
 	// Count words of documents in parallel
