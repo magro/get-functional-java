@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.testng.annotations.AfterClass;
@@ -40,21 +41,26 @@ public class WordCountTest {
 
 	private List<String> _fileNames;
 	private int _numFiles;
+	private int _numSharedWords;
+	private Map<String, Integer> _expectedWordsAndCounts;
 
 	@BeforeClass
 	void beforeClass() throws IOException, URISyntaxException {
-		_fileNames = nil();;
+		_fileNames = nil();
 		
-		_numFiles = 10;
+		_expectedWordsAndCounts = new HashMap<String, Integer>();
+		
+		_numFiles = 1000;
 		for(int i = 0; i < _numFiles; i++) {
 			final String fileName = "/tmp/wordcounttest-"+ i +".txt";
 			final BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
 			writer.write("File" + i + "\n");
-			writer.write("foo bar");
-			writer.write('\n');
-			writer.write("baz");
-			for(int j = 0; j < 200; j++)
+			_expectedWordsAndCounts.put("File" + i, 1);
+			_numSharedWords = 200;
+			for(int j = 0; j < _numSharedWords; j++) {
 				writer.write("\nsomeword" + j);
+				_expectedWordsAndCounts.put("someword" + j, _numFiles);
+			}
 			writer.close();
 			_fileNames = _fileNames.cons(fileName);
 		}
@@ -74,7 +80,7 @@ public class WordCountTest {
     
     @Test
     public void testWordCountFJ() {
-    	assertEquals(WordCountFJ.countWords(_fileNames).intValue(), 4 * _numFiles);
+    	assertEquals(WordCountFJ.countWords(_fileNames).intValue(), _numFiles + _numSharedWords);
     }
     
     @Test
@@ -84,6 +90,19 @@ public class WordCountTest {
     		System.out.println("Have " + entry.getKey() + ": " + entry.getValue());
     	}
 		assertNotNull(wordsAndCountsFromFiles);
+    	assertEquals(wordsAndCountsFromFiles.size(), _numFiles + _numSharedWords);
+    	assertEquals(wordsAndCountsFromFiles.toMutableMap(), _expectedWordsAndCounts);
+    }
+    
+    @Test
+    public void testWordsAndWordCountsInParallelFJ() {
+    	final TreeMap<String, Integer> wordsAndCountsFromFiles = WordCountFJ.getWordsAndCountsFromFilesInParallel(_fileNames);
+    	for(final Map.Entry<String, Integer> entry : wordsAndCountsFromFiles.toMutableMap().entrySet()) {
+    		System.out.println("Have " + entry.getKey() + ": " + entry.getValue());
+    	}
+		assertNotNull(wordsAndCountsFromFiles);
+    	assertEquals(wordsAndCountsFromFiles.size(), _numFiles + _numSharedWords);
+    	assertEquals(wordsAndCountsFromFiles.toMutableMap(), _expectedWordsAndCounts);
     }
 
 }
