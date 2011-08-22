@@ -130,7 +130,8 @@ public class WordCountFJ {
 	// Read documents and extract words and word counts of documents
 	public static Promise<TreeMap<String, Integer>> getWordsAndCountsFromFiles(
 			final List<String> fileNames, final ParModule m) {
-		final F<TreeMap<String, Integer>, F<TreeMap<String, Integer>, TreeMap<String, Integer>>> treeMapSum = new F<TreeMap<String, Integer>, F<TreeMap<String, Integer>, TreeMap<String, Integer>>>() {
+		final F<TreeMap<String, Integer>, F<TreeMap<String, Integer>, TreeMap<String, Integer>>> treeMapSum =
+				new F<TreeMap<String, Integer>, F<TreeMap<String, Integer>, TreeMap<String, Integer>>>() {
 			@Override
 			public F<TreeMap<String, Integer>, TreeMap<String, Integer>> f(
 					final TreeMap<String, Integer> a) {
@@ -145,17 +146,23 @@ public class WordCountFJ {
 			}
 			
 		};
-		final F<String, TreeMap<String, Integer>> fileNameToWordsAndCounts = new F<String, TreeMap<String, Integer>>() {
+		final F<String, TreeMap<String, Integer>> fileNameToWordsAndCounts =
+				new F<String, TreeMap<String, Integer>>() {
 			@Override
 			public TreeMap<String, Integer> f(final String a) {
-				return wordsFromLazyString.f(readFileToLazyString.f(a)).foldLeft(wordsAndCounts, TreeMap.<String, Integer> empty(stringOrd));
+				return wordsFromLazyString.f(readFileToLazyString.f(a))
+						.foldLeft(wordsAndCounts, TreeMap.<String, Integer> empty(stringOrd));
 			}
 		};
-		final Monoid<TreeMap<String, Integer>> monoid = monoid(treeMapSum, TreeMap.<String, Integer> empty(stringOrd));
+		final Monoid<TreeMap<String, Integer>> monoid = monoid(treeMapSum,
+				TreeMap.<String, Integer> empty(stringOrd));
 		return m.parFoldMap(fileNames, fileNameToWordsAndCounts, monoid);
 	}
 	
-	private static <K, V> TreeMap<K, V> plus(final TreeMap<K, V> a, final TreeMap<K, V> b, final F2<V, V, V> update, final Ord<K> ord) {
+	private static <K, V> TreeMap<K, V> plus(final TreeMap<K, V> a,
+			final TreeMap<K, V> b,
+			final F2<V, V, V> update,
+			final Ord<K> ord) {
 		if(a.isEmpty()) {
 			return b;
 		}
