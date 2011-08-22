@@ -50,7 +50,7 @@ public class WordCountTest {
 		
 		_expectedWordsAndCounts = new HashMap<String, Integer>();
 		
-		_numFiles = 1000;
+		_numFiles = 10;
 		for(int i = 0; i < _numFiles; i++) {
 			final String fileName = "/tmp/wordcounttest-"+ i +".txt";
 			final BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
