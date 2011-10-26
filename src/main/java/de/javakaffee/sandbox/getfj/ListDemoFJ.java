@@ -47,30 +47,47 @@ public class ListDemoFJ {
         }
     };
     
-    private static final F<Person, List<WebIdentity>> getWebIdentities = new F<Person, List<WebIdentity>>() {
+    public static final F<Person, List<WebIdentity>> getWebIdentities = new F<Person, List<WebIdentity>>() {
         @Override
         public List<WebIdentity> f(final Person a) {
             return iterableList(a.getWebIdentities());
         }
     };
     
-    private static final F2<List<WebIdentity>, Person, List<WebIdentity>> appendWebIdentities = new F2<List<WebIdentity>, Person, List<WebIdentity>>(){
+    public static final F2<List<WebIdentity>, Person, List<WebIdentity>> appendWebIdentities = new F2<List<WebIdentity>, Person, List<WebIdentity>>(){
         @Override
         public List<WebIdentity> f(final List<WebIdentity> a, final Person b) {
             return a.append(iterableList(b.getWebIdentities()));
         }
     };
     
-    private static final F<WebIdentity, String> getProfileUrl = new F<WebIdentity, String>() {
+    public static final F<WebIdentity, String> getProfileUrl = new F<WebIdentity, String>() {
         @Override
         public String f(final WebIdentity a) {
             return a.getProfileUrl();
         }
     };
     
-    private static final F<Person, Option<Integer>> getYearOfBirth = new F<Person, Option<Integer>>() {
+    public static final F<Person, Option<Calendar>> getDateOfBirth = new F<Person, Option<Calendar>>() {
+        @Override
+        public Option<Calendar> f(final Person p) {
+            return p.getDateOfBirth();
+        }
+    };
+
+    /**
+     * Generic function to extract the year from a Calendar, could go into some Calendars class.
+     */
+    public static final F<Calendar, Integer> getYear = new F<Calendar, Integer>() {
+        @Override
+        public Integer f(final Calendar cal) {
+            return cal.get(Calendar.YEAR);
+        }
+    };
+
+    public static final F<Person, Option<Integer>> getYearOfBirth = new F<Person, Option<Integer>>() {
 		@Override
-		public Option<Integer> f(Person p) {
+		public Option<Integer> f(final Person p) {
 			return p.getDateOfBirth().isSome() ? Option.<Integer> some(p.getDateOfBirth().some().get(Calendar.YEAR)) : Option.<Integer> none();
 		}
 	};
@@ -80,8 +97,10 @@ public class ListDemoFJ {
 	 */
     private static final F2<TreeMap<Integer, Integer>, Option<Integer>, TreeMap<Integer, Integer>> setOrAddOne = new F2<TreeMap<Integer, Integer>, Option<Integer>, TreeMap<Integer, Integer>>() {
 		@Override
-		public TreeMap<Integer, Integer> f(TreeMap<Integer, Integer> map,
-				Option<Integer> key) {
+		public TreeMap<Integer, Integer> f(final TreeMap<Integer, Integer> map,
+				final Option<Integer> key) {
+		    // an alternative would be
+		    //    return key.isSome() ? map.update(key.some(), Integers.add.f(1), 1) : map;
 			return key.isSome() ? map.set(key.some(), map.get(key.some()).orSome(0) + 1) : map;
 		}
 	};
@@ -116,7 +135,11 @@ public class ListDemoFJ {
     }
 
 	public TreeMap<Integer, Integer> getYearOfBirthGroupedByYear() {
-		return persons.map(getYearOfBirth).foldLeft(setOrAddOne, TreeMap.<Integer, Integer> empty(intOrd));
+	    // an alternative to
+	    //   .map(getDateOfBirth.andThen(getYear.mapOption()))...
+	    // is
+	    //   .map(getDateOfBirth).map(getYear.mapOption)...
+		return persons.map(getDateOfBirth.andThen(getYear.mapOption())).foldLeft(setOrAddOne, TreeMap.<Integer, Integer> empty(intOrd));
 	}
 
 }
