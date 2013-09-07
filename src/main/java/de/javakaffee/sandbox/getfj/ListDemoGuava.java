@@ -20,7 +20,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import scala.actors.threadpool.Arrays;
+
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
 
 import de.javakaffee.sandbox.getfj.Person.Gender;
 
@@ -29,7 +34,14 @@ import de.javakaffee.sandbox.getfj.Person.Gender;
  *
  */
 public class ListDemoGuava {
-    
+
+    private static final Function<Person, String> getName = new Function<Person, String>() {
+        @Override
+        public String apply(final Person input) {
+            return input.getName();
+        }
+    };
+
     private static final Predicate<Person> ofFullAge = new Predicate<Person>(){
 
         @Override
@@ -37,7 +49,7 @@ public class ListDemoGuava {
             return input.isOfFullAge();
         }
     };
-    
+
     private static final Predicate<Person> male = new Predicate<Person>(){
 
         @Override
@@ -45,11 +57,15 @@ public class ListDemoGuava {
             return input.getGender() == Gender.MALE;
         }
     };
-        
+
     private final List<Person> persons;
-    
+
     public ListDemoGuava(final List<Person> persons) {
         this.persons = persons;
+    }
+
+    public Collection<String> getNames() {
+        return Collections2.transform(persons, getName);
     }
 
     public Collection<Person> getPersonsOfFullAge() {
@@ -65,7 +81,8 @@ public class ListDemoGuava {
     }
 
     public List<Person> getMenOfFullAgeAsList() {
-        return new ArrayList<Person>(filter(filter(persons, ofFullAge), male));
+        return new ArrayList<Person>(filter(persons, Predicates.and(Arrays.asList(ofFullAge, male))));
+        // return new ArrayList<Person>(filter(filter(persons, ofFullAge), male));
     }
 
 }

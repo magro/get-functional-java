@@ -25,15 +25,15 @@ import fj.data.Option;
  * @author Martin Grotzke
  */
 public class Person {
-    
+
     public static enum Gender {
         MALE, FEMALE
     }
-    
+
     public static enum Skill {
         HTML, JAVASCRIPT, JAVA, SCALA, PYTHON, RUBY
     }
-    
+
     private final String name;
     private final Gender gender;
     private final int age;
@@ -41,11 +41,11 @@ public class Person {
     private final List<WebIdentity> webIdentities;
     private Calendar dateOfBirthNullable;
     private Option<Calendar> dateOfBirth;
-    
+
     // WebIdentities -> map auf person-url, count nach Anbieter
     // MusicCollection(Albums, Artist, Song) -> Gruppieren, zählen
     // parallele Ausführung: finden mit Ähnlichkeitssuche (Levenstein) auf Song
-    
+
     public Person(final String name, final Gender gender, final int age) {
         this(name, gender, age, Collections.<Skill> emptySet(), Collections.<WebIdentity> emptyList());
     }
@@ -56,17 +56,17 @@ public class Person {
         this.skills = skills;
         this.webIdentities = webIdentities;
     }
-    
+
     public Calendar getDateOfBirthNullable() {
 		return dateOfBirthNullable;
 	}
-	public void setDateOfBirthNullable(Calendar dateOfBirthNullable) {
+	public void setDateOfBirthNullable(final Calendar dateOfBirthNullable) {
 		this.dateOfBirthNullable = dateOfBirthNullable;
 	}
 	public Option<Calendar> getDateOfBirth() {
 		return dateOfBirth;
 	}
-	public void setDateOfBirth(Option<Calendar> dateOfBirth) {
+	public void setDateOfBirth(final Option<Calendar> dateOfBirth) {
 		this.dateOfBirth = dateOfBirth;
 	}
 	public String getName() {
@@ -86,6 +86,10 @@ public class Person {
     }
     public List<WebIdentity> getWebIdentities() {
         return webIdentities;
+    }
+    @Override
+    public String toString() {
+        return "Person [name=" + name + ", gender=" + gender + ", age=" + age + "]";
     }
 
 }

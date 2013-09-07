@@ -32,42 +32,49 @@ import fj.data.TreeMap;
  *
  */
 public class ListDemoFJ {
-    
+
+    private static final F<Person, String> getName = new F<Person, String>() {
+        @Override
+        public String f(final Person a) {
+            return a.getName();
+        }
+    };
+
     private static final F<Person, Boolean> ofFullAge = new F<Person, Boolean>(){
         @Override
         public Boolean f(final Person a) {
             return a.isOfFullAge();
         }
     };
-    
+
     private static final F<Person, Boolean> male = new F<Person, Boolean>(){
         @Override
         public Boolean f(final Person a) {
             return a.getGender() == Gender.MALE;
         }
     };
-    
+
     public static final F<Person, List<WebIdentity>> getWebIdentities = new F<Person, List<WebIdentity>>() {
         @Override
         public List<WebIdentity> f(final Person a) {
             return iterableList(a.getWebIdentities());
         }
     };
-    
+
     public static final F2<List<WebIdentity>, Person, List<WebIdentity>> appendWebIdentities = new F2<List<WebIdentity>, Person, List<WebIdentity>>(){
         @Override
         public List<WebIdentity> f(final List<WebIdentity> a, final Person b) {
             return a.append(iterableList(b.getWebIdentities()));
         }
     };
-    
+
     public static final F<WebIdentity, String> getProfileUrl = new F<WebIdentity, String>() {
         @Override
         public String f(final WebIdentity a) {
             return a.getProfileUrl();
         }
     };
-    
+
     public static final F<Person, Option<Calendar>> getDateOfBirth = new F<Person, Option<Calendar>>() {
         @Override
         public Option<Calendar> f(final Person p) {
@@ -95,13 +102,13 @@ public class ListDemoFJ {
 	/**
 	 * A generic function that sets or adds 1 for the given (optional) key.
 	 */
-    private static final F2<TreeMap<Integer, Integer>, Option<Integer>, TreeMap<Integer, Integer>> setOrAddOne = new F2<TreeMap<Integer, Integer>, Option<Integer>, TreeMap<Integer, Integer>>() {
+    private static final F2<TreeMap<Integer, Integer>, Integer, TreeMap<Integer, Integer>> setOrAddOne = new F2<TreeMap<Integer, Integer>, Integer, TreeMap<Integer, Integer>>() {
 		@Override
 		public TreeMap<Integer, Integer> f(final TreeMap<Integer, Integer> map,
-				final Option<Integer> key) {
+				final Integer key) {
 		    // an alternative would be
-		    //    return key.isSome() ? map.update(key.some(), Integers.add.f(1), 1) : map;
-			return key.isSome() ? map.set(key.some(), map.get(key.some()).orSome(0) + 1) : map;
+//		        return map.update(key, Integers.add.f(1), 1);
+			return map.set(key, map.get(key).orSome(0) + 1);
 		}
 	};
 
@@ -113,11 +120,15 @@ public class ListDemoFJ {
             }
         };
     }
-        
+
     private final fj.data.List<Person> persons;
-    
+
     public ListDemoFJ(final java.util.List<Person> persons) {
         this.persons = List.iterableList(persons);
+    }
+
+    public List<String> getNames() {
+        return persons.map(getName);
     }
 
     public List<Person> getPersonsOfFullAge() {
@@ -139,7 +150,8 @@ public class ListDemoFJ {
 	    //   .map(getDateOfBirth.andThen(getYear.mapOption()))...
 	    // is
 	    //   .map(getDateOfBirth).map(getYear.mapOption)...
-		return persons.map(getDateOfBirth.andThen(getYear.mapOption())).foldLeft(setOrAddOne, TreeMap.<Integer, Integer> empty(intOrd));
+		final F<Person, Option<Integer>> getYearOfBirth = getDateOfBirth.andThen(getYear.mapOption());
+        return Option.somes(persons.map(getYearOfBirth)).foldLeft(setOrAddOne, TreeMap.<Integer, Integer> empty(intOrd));
 	}
 
 }
