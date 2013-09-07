@@ -45,7 +45,7 @@ public class ListDemoTest {
         final ListDemoCC demo = new ListDemoCC(items);
         final List<Person> ofFullAge = demo.getMenOfFullAge();
         assertNotNull(ofFullAge);
-        assertEquals(ofFullAge.size(), 1);
+        assertEquals(ofFullAge.size(), 3);
         assertEquals(ofFullAge, items);
     }
     
@@ -54,7 +54,7 @@ public class ListDemoTest {
         final ListDemoGuava demo = new ListDemoGuava(items);
         final List<Person> ofFullAge = demo.getMenOfFullAgeAsList();
         assertNotNull(ofFullAge);
-        assertEquals(ofFullAge.size(), 1);
+        assertEquals(ofFullAge.size(), 3);
         assertEquals(ofFullAge, items);
     }
     
@@ -63,7 +63,7 @@ public class ListDemoTest {
         final ListDemoFJ demo = new ListDemoFJ(items);
         final fj.data.List<Person> ofFullAge = demo.getMenOfFullAge();
         assertNotNull(ofFullAge);
-        assertEquals(ofFullAge.length(), 1);
+        assertEquals(ofFullAge.length(), 3);
         assertEquals(ofFullAge.toCollection(), items);
     }
     
@@ -73,7 +73,7 @@ public class ListDemoTest {
         final fj.data.List<String> items = demo.getWebIdentitiesOfMenWithSkill(Skill.JAVA);
         listShow(stringShow).println(items);
         assertNotNull(items);
-        assertEquals(items.length(), 2);
+        assertEquals(items.length(), 3);
     }
     
     private static final F2<Integer, Person, Integer> setDateOfBirth = new F2<Integer, Person, Integer>() {
