@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import scala.actors.threadpool.Arrays;
+import java.util.Arrays;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
